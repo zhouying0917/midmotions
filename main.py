@@ -90,6 +90,7 @@ class MiMotionRunner:
         password = str(_passwd)
         self.invalid = False
         self.log_str = ""
+        print(user,password)
         if user == '' or password == '':
             self.error = "用户名或密码填写有误！"
             self.invalid = True
