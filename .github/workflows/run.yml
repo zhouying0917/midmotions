@@ -1,5 +1,8 @@
 name: 刷步数
 
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: '39 1,4,7,10,12,14,23 * * *'
@@ -37,5 +40,11 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@users.noreply.github.com
           git add .
-          git commit -m "persist tokens trigger by ${{ github.event_name }}"
-          git push origin master
+          # 核心修复：判断是否存在文件改动，无改动直接跳过提交
+          CHANGES=$(git status --porcelain)
+          if [ -n "$CHANGES" ]; then
+            git commit -m "persist tokens trigger by ${{ github.event_name }}"
+            git push origin master
+          else
+            echo "无文件变更，跳过commit与push，任务正常结束"
+          fi
