@@ -23,6 +23,12 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@users.noreply.github.com
           git add .
-          current=`TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S'`
-          git commit -m "[${current}] random cron trigger by ${{ github.event_name }}"
-          git push origin master
+          # 核心修复：判断是否有文件改动，无改动则跳过提交推送
+          if [ -n "$(git status --porcelain)" ]; then
+              current=`TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S'`
+              git commit -m "[${current}] random cron trigger by ${{ github.event_name }}"
+              git push origin master
+              echo "文件已更新，完成提交推送"
+          else
+              echo "工作区无任何文件变更，跳过commit和push，任务正常结束"
+          fi
